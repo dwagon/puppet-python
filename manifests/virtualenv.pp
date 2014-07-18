@@ -46,6 +46,9 @@
 # [*timeout*]
 #  The maximum time in seconds the "pip install" command should take. Default: 1800
 #
+# [*install_args*]
+#  Any additional install arguments to the pip command (e.g. --pre). Default: none
+#
 # === Examples
 #
 # python::virtualenv { '/var/www/project1':
@@ -76,6 +79,7 @@ define python::virtualenv (
   $group            = 'root',
   $proxy            = false,
   $environment      = [],
+  $install_args     = '',
   $path             = [ '/bin', '/usr/bin', '/usr/sbin' ],
   $cwd              = undef,
   $timeout          = 1800
@@ -139,7 +143,7 @@ define python::virtualenv (
 
     if $requirements {
       exec { "python_requirements_initial_install_${requirements}_${venv_dir}":
-        command     => "${venv_dir}/bin/pip wheel --help > /dev/null 2>&1 && { ${venv_dir}/bin/pip wheel --version > /dev/null 2>&1 || wheel_support_flag='--no-use-wheel'; } ; ${venv_dir}/bin/pip --log ${venv_dir}/pip.log install ${pypi_index} ${proxy_flag} \$wheel_support_flag -r ${requirements}",
+        command     => "${venv_dir}/bin/pip wheel --help > /dev/null 2>&1 && { ${venv_dir}/bin/pip wheel --version > /dev/null 2>&1 || wheel_support_flag='--no-use-wheel'; } ; ${venv_dir}/bin/pip --log ${venv_dir}/pip.log install ${pypi_index} ${install_args} ${proxy_flag} \$wheel_support_flag -r ${requirements}",
         refreshonly => true,
         timeout     => $timeout,
         user        => $owner,
